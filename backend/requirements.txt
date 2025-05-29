@@ -1,0 +1,17 @@
+fastapi
+uvicorn
+sqlalchemy
+python-multipart
+pymysql
+boto3
+openai
+python-jose[cryptography]
+requests
+python-dotenv
+langchain-community
+langchain-openai
+langchain
+langgraph
+openpyxl
+pandas
+numpy

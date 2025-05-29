@@ -1,0 +1,24 @@
+# 맥OS 시스템 파일
+.DS_Store
+
+# 환경 관련 파일
+.env
+venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# 랭체인 관련 (필요시)
+langchain*/
+
+# 이미지 파일 (필요시 제외)
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# 기타
+.idea/
+.vscode/
