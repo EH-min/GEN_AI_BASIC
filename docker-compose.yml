@@ -1,0 +1,88 @@
+services:
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - db
+      - backend
+      - frontend
+    networks:
+      - my_network
+    command: "/bin/sh -c 'while :; do sleep 6h & wait $${!}; nginx -s reload; done & nginx -g \"daemon off;\"'"
+    restart: always
+  
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    container_name: frontend
+    working_dir: /app/frontend
+    # volumes:
+    #   - ./frontend:/app/frontend  
+    #   - ./frontend/node_modules:/app/frontend/node_modules
+    environment:
+      PORT: 5000 
+    networks:
+      - my_network
+    # ports:
+    #   - "5000:5000"            
+    depends_on:
+      - backend         
+    # command: npm run dev -- --host
+    restart: always      
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    container_name: backend
+    env_file: .env
+    volumes:
+      - ./backend:/app/backend  
+    networks:
+      - my_network
+    # ports:
+    #   - "8000:8000"          
+    environment:
+      PORT: 8000 
+    depends_on:
+      - db     
+    command: >
+      gunicorn  main:app
+        --bind 0.0.0.0:8000 
+        --worker-class uvicorn.workers.UvicornWorker     
+        --timeout 120
+        --workers 2
+    restart: always        
+
+  # Database - MariaDB 서비스
+  db:
+    image: mariadb:latest
+    container_name: db_service
+    env_file: .env
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      TZ: Asia/Seoul
+      PORT: 3306 
+    command :
+      [
+          "--character-set-server=utf8mb4",
+          "--collation-server=utf8mb4_unicode_ci",
+      ]
+    volumes:
+      - ./data:/var/lib/mysql 
+      - ./backend/db/initdb.d:/docker-entrypoint-initdb.d
+    networks:
+      - my_network
+    ports:
+      - "3306:3306"           
+    restart: always 
+
+networks:
+  my_network:

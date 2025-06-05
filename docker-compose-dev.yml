@@ -1,0 +1,62 @@
+version: '3.9'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: ./frontend/Dockerfile
+    container_name: frontend_service
+    working_dir: /app/frontend
+    volumes:
+      - ./frontend:/app/frontend  
+      - ./frontend/node_modules:/app/frontend/node_modules
+    networks:
+      - my_network
+    ports:
+      - "5000:5000"            
+    depends_on:
+      - backend         
+    command: npm run dev -- --host
+    restart: always      
+
+  backend:
+    build:
+      context: .
+      dockerfile: ./backend/Dockerfile
+    container_name: backend_service
+    volumes:
+      - ./backend:/app/backend  
+    networks:
+      - my_network
+    ports:
+      - "8000:8000"          
+    depends_on:
+      - db          
+    restart: always        
+
+  # Database - MariaDB 서비스
+  db:
+    image: mariadb:latest
+    container_name: db_service
+    env_file: .env
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MARIADB_DATABASE}
+      MARIADB_USER: ${MARIADB_USER}
+      MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+      TZ: Asia/Seoul
+    command :
+      [
+          "--character-set-server=utf8mb4",
+          "--collation-server=utf8mb4_unicode_ci",
+      ]
+    volumes:
+      - ./data:/var/lib/mysql 
+    networks:
+      - my_network
+    ports:
+      - "3306:3306"           
+    restart: always 
+
+networks:
+  my_network:
