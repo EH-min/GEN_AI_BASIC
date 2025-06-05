@@ -5,14 +5,14 @@ from domain import ai_router
 app = FastAPI()
 
 origins = [
-    "http://localhost:5000",
+    "http://localhost:5000"
 ]
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
-    allow_headers=["*"],
+    allow_headers=["*"]
 )
 app.include_router(ai_router.router)
 
@@ -22,5 +22,5 @@ if __name__ == "__main__":
         "main:app",
         reload=True,
         host="localhost",
-        port=8000,
+        port=8000
     )

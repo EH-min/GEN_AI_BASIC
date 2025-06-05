@@ -9,7 +9,7 @@ services:
     working_dir: /app/frontend
     volumes:
       - ./frontend:/app/frontend  
-      - ./frontend/node_modules:/app/frontend/node_modules
+      - /app/frontend/node_modules
     networks:
       - my_network
     ports:
